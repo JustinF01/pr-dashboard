@@ -36,7 +36,8 @@ app.post("/post/prs/", async(req: Request, res: Response) => {
             description: req.body.description,
             author: req.body.author,
             status: req.body.status,
-            labels: req.body.labels
+            labels: req.body.labels,
+            date: req.body.date
         }
         const result = await collection.insertOne(body);
         res.send(result);
@@ -83,4 +84,4 @@ app.post("/filter/label/", async(req: Request, res: Response) => {
     }
 });
 
-app.listen(port, () => {console.log(`app is listening at http://localhost:${port}`)});
+app.listen(port, () => {console.log(`server is listening at http://localhost:${port}`)});
