@@ -124,7 +124,7 @@ const MiniDrawer: React.FC<Props> = ({children}) => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Skytale Home Assignment
+            Pull Request Dashboard
           </Typography>
         </Toolbar>
       </AppBar>
@@ -136,16 +136,15 @@ const MiniDrawer: React.FC<Props> = ({children}) => {
         </DrawerHeader>
         <Divider />
         <List>
-            <Link to="/">
+            <Link to="/" style={{textDecoration: "none", color: "#1976d2"}}>
                 <ListItem button>
                     <ListItemIcon>
                         <AddBoxIcon /> 
                     </ListItemIcon>
                     <ListItemText primary={"Create PR"} />
-                
                 </ListItem>
             </Link>
-            <Link to="/list">
+            <Link to="/list" style={{textDecoration: "none", color: "#1976d2"}}>
                 <ListItem button>
                     <ListItemIcon>
                         <FormatListBulletedIcon /> 

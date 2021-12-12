@@ -9,7 +9,6 @@ const CreateScreen: React.FC = () => {
     const [author, setAuthor] = useState<string>('');
     const [status, setStatus] = useState<string>('');
     const [labels, setLabels] = useState<string>('');
-    const [message, setMessage] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(false);
 
     const handleNoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +32,6 @@ const CreateScreen: React.FC = () => {
     const Send = () => {
         setLoading(true);
         const sanitizedLabels = labels.toLowerCase().replace(/ /g, '');
-        console.log(sanitizedLabels);
         const data = {
             no,
             title,
@@ -64,8 +62,9 @@ const CreateScreen: React.FC = () => {
                     <Box sx={{py: 2}}>
                         <Typography component="h1" variant="h4">Create a Pull Request</Typography>
                     </Box>
-                    {/* user feedback message here */}
+
                     { loading ? <CircularProgress/> : null }
+
                     <Paper variant="outlined">
                         <Box component="form" autoComplete="false" sx={{p: 2, display: "flex", justifyContent: "flex-start", alignItems: "stretch", flexDirection: "column"}}>
                             <Box sx={{display: "flex", width: "100%"}}>
@@ -104,6 +103,7 @@ const CreateScreen: React.FC = () => {
                             </Box>
                         </Box>
                     </Paper>
+                    
                 </Container>
             </Box>
         </Box>

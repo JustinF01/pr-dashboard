@@ -1,7 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
-import { List, Typography, Box, TextField, MenuItem, Container } from "@mui/material";
+import { List, Typography, Box, Container } from "@mui/material";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
+import Filter from "../components/Filters";
 import { pullRequest } from "../models/pr";
 import axios from "axios";
 var arraySort = require('array-sort');
@@ -111,62 +112,10 @@ const ListScreen: React.FC = () => {
                 <Typography component="h1" variant="h4">All Pull Requests</Typography>
 
                 <Box component="form" noValidate autoComplete="off" sx={{p: 1, display: "flex", justifyContent: "flex-start", alignItems: "stretch", flexWrap: "wrap"}}>
-                    <Box sx={{mr: 1}}>
-                        <TextField
-                            id="outlined-select-status"
-                            select
-                            fullWidth
-                            label="Status"
-                            value={status}
-                            size="small"
-                            onChange={handleStatusChange}
-                            helperText="Filter on status"
-                            >
-                            <MenuItem value="All">All</MenuItem>
-                            {statuses.map((option, index) => (
-                                
-                                <MenuItem key={index} value={option}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Box>
-                    <Box sx={{mr: 1}}>
-                        <TextField
-                            id="outlined-select-label"
-                            select
-                            fullWidth
-                            label="Labels"
-                            value={label}
-                            size="small"
-                            onChange={handleLabelChange}
-                            helperText="Filter on label"
-                            >
-                            {filterLabels.map((option, index) => (
-                                <MenuItem key={index} value={option}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Box>
-                    <Box sx={{width: "100%", maxWidth: "120px"}}>
-                        <TextField
-                            id="outlined-select-sort"
-                            select
-                            fullWidth
-                            label="Sort By"
-                            value=""
-                            size="small"
-                            onChange={sortBy}
-                            helperText="Sort Items"
-                            >
-                            {sortOptions.map((option, index) => (
-                                <MenuItem key={index} value={option}>
-                                    {option}
-                                </MenuItem>
-                            ))}
-                        </TextField>
-                    </Box>
+                   {/** status, statuses and handleStatusChange */}
+                   <Filter filter={status} filters={statuses} filterMethod={handleStatusChange} label="Status" helperText="Filter by Status" />
+                   <Filter filter={label} filters={filterLabels} filterMethod={handleLabelChange} label="Labels" helperText="Filter by Labels" />
+                   <Filter filter={sort} filters={sortOptions} filterMethod={sortBy} label="Sort By" helperText="Sort Items" />
                 </Box>
 
                 { loading ? <Loader/> : <List>{data}</List> }
