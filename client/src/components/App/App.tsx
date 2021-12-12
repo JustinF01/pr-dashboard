@@ -1,6 +1,6 @@
 
 
-import Container from "../Container/Container";
+import Container from "../Container";
 import ListScreen from '../../screens/list';
 import CreateScreen from '../../screens/create';
 import { Routes, Route } from "react-router-dom";
@@ -11,7 +11,7 @@ function App() {
       <Container>
         <Routes>
           <Route path="/" element={<CreateScreen/>}/>
-          <Route path="/list-prs" element={<ListScreen/>} />
+          <Route path="/list" element={<ListScreen/>} />
         </Routes>
       </Container>
     </div>

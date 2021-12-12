@@ -5,5 +5,5 @@ export type pullRequest = {
     author: string,
     status: string,
     labels: string[],
-    creation_date: string
+    date: Date
 }

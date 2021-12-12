@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { Box, Typography, TextField, Container, Paper, MenuItem, Button } from "@mui/material";
+import { Box, Typography, TextField, Container, Paper, MenuItem, Button, CircularProgress } from "@mui/material";
 import axios from "axios";
 
 const CreateScreen: React.FC = () => {
@@ -8,7 +8,9 @@ const CreateScreen: React.FC = () => {
     const [description, setDescription] = useState<string>('');
     const [author, setAuthor] = useState<string>('');
     const [status, setStatus] = useState<string>('');
-    const [labels, setLabels] = useState<string[]>([]);
+    const [labels, setLabels] = useState<string>('');
+    const [message, setMessage] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
 
     const handleNoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNo(event.target.value);
@@ -26,18 +28,20 @@ const CreateScreen: React.FC = () => {
         setStatus(event.target.value);
     }
     const handleLabelsChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const labelsArr = event.target.value.split(",");
-        setLabels(labelsArr);
+        setLabels(event.target.value);
     }
     const Send = () => {
-        console.log("button clicked...");
+        setLoading(true);
+        const sanitizedLabels = labels.toLowerCase().replace(/ /g, '');
+        console.log(sanitizedLabels);
         const data = {
             no,
             title,
             description,
             author,
             status,
-            labels
+            labels: sanitizedLabels.split(','),
+            date: new Date()
         };
         axios.post("/post/prs/", data)
         .then(res => {
@@ -45,8 +49,9 @@ const CreateScreen: React.FC = () => {
             setTitle("");
             setDescription("");
             setStatus("");
-            setLabels([]);
+            setLabels('');
             setAuthor("");
+            setLoading(false);
         })
         .catch(error => console.log(error));
 
@@ -59,6 +64,8 @@ const CreateScreen: React.FC = () => {
                     <Box sx={{py: 2}}>
                         <Typography component="h1" variant="h4">Create a Pull Request</Typography>
                     </Box>
+                    {/* user feedback message here */}
+                    { loading ? <CircularProgress/> : null }
                     <Paper variant="outlined">
                         <Box component="form" autoComplete="false" sx={{p: 2, display: "flex", justifyContent: "flex-start", alignItems: "stretch", flexDirection: "column"}}>
                             <Box sx={{display: "flex", width: "100%"}}>
@@ -87,7 +94,7 @@ const CreateScreen: React.FC = () => {
                                         </TextField>
                                     </Box>
                                     <Box sx={{flexGrow: 1}}>
-                                        <TextField fullWidth id="labels" label="Labels" value={labels.join()} onChange={handleLabelsChange} helperText="Please use comma(,) separated values(CSV)" />
+                                        <TextField fullWidth id="labels" label="Labels" value={labels} onChange={handleLabelsChange} helperText="Please use comma(,) separated values(CSV)" />
                                     </Box>
 
                                 </Box>

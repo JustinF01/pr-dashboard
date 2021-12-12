@@ -145,7 +145,7 @@ const MiniDrawer: React.FC<Props> = ({children}) => {
                 
                 </ListItem>
             </Link>
-            <Link to="/list-prs">
+            <Link to="/list">
                 <ListItem button>
                     <ListItemIcon>
                         <FormatListBulletedIcon /> 

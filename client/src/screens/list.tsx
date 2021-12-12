@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { List, Divider, Typography, Box, Paper, Chip,  TextField, MenuItem, Container } from "@mui/material";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { List, Typography, Box, TextField, MenuItem, Container } from "@mui/material";
+import Loader from "../components/Loader";
+import Card from "../components/Card";
 import { pullRequest } from "../models/pr";
 import axios from "axios";
-import moment from 'moment';
+var arraySort = require('array-sort');
 
 
 const ListScreen: React.FC = () => {
@@ -11,109 +13,103 @@ const ListScreen: React.FC = () => {
     const [label, setLabel] = useState<string>("");
     const [statuses, setStatuses] = useState<string[]>([]);
     const [filterLabels, setFilterLabels] = useState<string[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [sort, setSort] = useState("");
 
     useEffect(() => {
+        setLoading(true);
         axios.get("/get/prs/")
-        .then(res => setItems(res.data))
+        .then(res => {
+            setItems(res.data);
+            setLoading(false);
+        })
         .catch(error => console.log(error.message));
     }, []);
+
     useEffect(() => {
         if (status) {
+            setLoading(true);
             axios.post("/filter/status/", {status})
-            .then(res => setItems(res.data))
+            .then(res => {setItems(res.data); setLoading(false);})
             .catch(error => console.log(error));
         }
-       
     }, [status]);
+
     useEffect(() => {
         if (label) {
+            setLoading(true);
             axios.post("/filter/label/", {label})
-            .then(res => setItems(res.data))
+            .then(res => {setItems(res.data); setLoading(false);})
             .catch(error => console.log(error));
         }
-       
     }, [label]);
 
-    const data = items.map((item, index) => {
-        return (
-            <Box key={index} sx={{my: 1}}>
-                <Paper elevation={3}>
-                    <Box sx={{display: "flex", alignItems: "center", py: 1, px: 2}}>
-                        <Box sx={{mr: 1, p: 1, borderRadius: "8px", bgcolor: "success.light", color: "white", display: "flex", alignItems: "center", justifyContent: "center"}}>
-                            <Typography>{item.no}</Typography>
-                        </Box>
-                        <Box>
-                            <Typography variant="h5">{item.title}</Typography>
-                        </Box>
-                    </Box>
-                    
-                    <Box sx={{display: "flex", justifyContent: "space-between", alignItems: "stretch", p: 2, flexWrap: "wrap"}}>
-                        <Box>
-                            <Typography variant="h6">Description</Typography>
-                            <Divider/>
-                            <Box sx={{mt: 1}}>
-                                <Typography>{item.description}</Typography>
-                            </Box>
-                        </Box>
-                        <Box>
-                            <Typography variant="h6">Author</Typography>
-                            <Divider/>
-                            <Box sx={{mt: 1}}>
-                                <Typography>{item.author}</Typography>
-                            </Box>
-                        </Box>
-                        <Box>
-                            <Typography variant="h6">Status</Typography>
-                            <Divider/>
-                            <Box sx={{mt: 1}}>
-                                <Typography>{item.status}</Typography>
-                            </Box>
-                        </Box>
-                        <Box>
-                            <Typography variant="h6">Labels</Typography>
-                            <Divider/>
-                            <Box sx={{mt: 1}}>
-                                { item.labels.map( (label, index) => ( <Box key={index} component="span" sx={{mx: "2px"}}><Chip label={label} color="success" size="small"/></Box> ) ) }
-                            </Box>
-                        </Box>
-                        <Box>
-                            <Typography variant="h6">Date</Typography>
-                            <Divider/>
-                            <Box sx={{mt: 1}}>
-                                <Typography>{moment(item.creation_date).format("DD/MM/YYYY")}</Typography>
-                            </Box>
-                        </Box>
-                    </Box>
-                </Paper>
-            </Box>
-        )
-    });
-    // filter forms
+    useEffect(() => {
+        if (sort) {
+            switch (sort) {
+                case "Title ASC":
+                    arraySort(items, "title");
+                break;
+                case "Title DESC":
+                    arraySort(items, "title", {reverse: true});
+                break;
+                case "No ASC":
+                    arraySort(items, "no");
+                break;
+                case "No DESC":
+                    arraySort(items, "no", {reverse: true});
+                break;
+                default:
+                break;
+            }
+        }
+       
+    }, [sort, items]);
 
+    // PR card or item
+    const data = items.map((item, index) => {
+        return <Card key={index} item={item} />
+    });
+
+    // filter options for label and status
     items.forEach(item => {
         if (statuses.find(s => s === item.status) === undefined) {
             statuses.push(item.status);
         }
     });
+
     items.forEach((item) => {
         item.labels.forEach((i) => {
-            if ( filterLabels.includes(i) === false ) {
+            if ( filterLabels.includes(i.toLowerCase()) === false ) {
                 filterLabels.push(i);
             }
         });
     });
+
     const handleStatusChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setStatus(event.target.value);
     };
+
     const handleLabelChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setLabel(event.target.value);
     };
-    
+
+    const sortOptions = [
+        "Title ASC",
+        "Title DESC",
+        "No ASC",
+        "No DESC"
+    ];
+
+    const sortBy = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSort(event.target.value);
+    }
 
     return (
         <Box>
             <Container  maxWidth="md">
                 <Typography component="h1" variant="h4">All Pull Requests</Typography>
+
                 <Box component="form" noValidate autoComplete="off" sx={{p: 1, display: "flex", justifyContent: "flex-start", alignItems: "stretch", flexWrap: "wrap"}}>
                     <Box sx={{mr: 1}}>
                         <TextField
@@ -135,7 +131,7 @@ const ListScreen: React.FC = () => {
                             ))}
                         </TextField>
                     </Box>
-                    <Box>
+                    <Box sx={{mr: 1}}>
                         <TextField
                             id="outlined-select-label"
                             select
@@ -153,10 +149,27 @@ const ListScreen: React.FC = () => {
                             ))}
                         </TextField>
                     </Box>
+                    <Box sx={{width: "100%", maxWidth: "120px"}}>
+                        <TextField
+                            id="outlined-select-sort"
+                            select
+                            fullWidth
+                            label="Sort By"
+                            value=""
+                            size="small"
+                            onChange={sortBy}
+                            helperText="Sort Items"
+                            >
+                            {sortOptions.map((option, index) => (
+                                <MenuItem key={index} value={option}>
+                                    {option}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Box>
                 </Box>
-                <List>
-                    {data}
-                </List>
+
+                { loading ? <Loader/> : <List>{data}</List> }
             </Container>
         </Box>
     )
