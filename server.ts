@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
-import { Collection } from "mongodb";
 import { client } from "./database/connect";
-import bodyParser, { BodyParser } from "body-parser";
+import bodyParser from "body-parser";
 
 const app = express();
 const port = 4000;
@@ -77,7 +76,6 @@ app.post("/filter/label/", async(req: Request, res: Response) => {
         const result = await collection.find({
             labels: { "$all" : [label] }
         }).toArray();
-        console.log(result);
         res.json(result);
     } catch (error) {
         res.json({"message": "something went wrong with the connection..."});

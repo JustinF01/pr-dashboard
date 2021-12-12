@@ -1,11 +1,11 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { List, Typography, Box, Container } from "@mui/material";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
-import Filter from "../components/Filters";
+import Filter from "../components/Filter";
 import { pullRequest } from "../models/pr";
 import axios from "axios";
-var arraySort = require('array-sort');
+const arraySort = require('array-sort');
 
 
 const ListScreen: React.FC = () => {
@@ -15,7 +15,7 @@ const ListScreen: React.FC = () => {
     const [statuses, setStatuses] = useState<string[]>([]);
     const [filterLabels, setFilterLabels] = useState<string[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [sort, setSort] = useState("");
+    const [sort, setSort] = useState<string>("");
 
     useEffect(() => {
         setLoading(true);
@@ -44,28 +44,6 @@ const ListScreen: React.FC = () => {
             .catch(error => console.log(error));
         }
     }, [label]);
-
-    useEffect(() => {
-        if (sort) {
-            switch (sort) {
-                case "Title ASC":
-                    arraySort(items, "title");
-                break;
-                case "Title DESC":
-                    arraySort(items, "title", {reverse: true});
-                break;
-                case "No ASC":
-                    arraySort(items, "no");
-                break;
-                case "No DESC":
-                    arraySort(items, "no", {reverse: true});
-                break;
-                default:
-                break;
-            }
-        }
-       
-    }, [sort, items]);
 
     // PR card or item
     const data = items.map((item, index) => {
@@ -104,6 +82,22 @@ const ListScreen: React.FC = () => {
 
     const sortBy = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSort(event.target.value);
+        switch (event.target.value) {
+            case "Title ASC":
+                arraySort(items, "title");
+            break;
+            case "Title DESC":
+                arraySort(items, "title", {reverse: true});
+            break;
+            case "No ASC":
+                arraySort(items, "no");
+            break;
+            case "No DESC":
+                arraySort(items, "no", {reverse: true});
+            break;
+            default:
+            break;
+        }
     }
 
     return (
@@ -112,7 +106,6 @@ const ListScreen: React.FC = () => {
                 <Typography component="h1" variant="h4">All Pull Requests</Typography>
 
                 <Box component="form" noValidate autoComplete="off" sx={{p: 1, display: "flex", justifyContent: "flex-start", alignItems: "stretch", flexWrap: "wrap"}}>
-                   {/** status, statuses and handleStatusChange */}
                    <Filter filter={status} filters={statuses} filterMethod={handleStatusChange} label="Status" helperText="Filter by Status" />
                    <Filter filter={label} filters={filterLabels} filterMethod={handleLabelChange} label="Labels" helperText="Filter by Labels" />
                    <Filter filter={sort} filters={sortOptions} filterMethod={sortBy} label="Sort By" helperText="Sort Items" />
